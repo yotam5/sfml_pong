@@ -22,19 +22,21 @@ void Game::init() {
 void Game::update() {
   this->pollEvents();
 
-  //update paddle location of player
-  if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-  {
-    this->paddle.moveDown();
-  }
-  else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-  {
-    this->paddle.moveUp();
-  }
+  this->updatePlayerPaddle();
+  this->ballPaddleCollision();
   this->ball.updatePosition();
   this->ballWallCollision();
 }
 
+void Game::updatePlayerPaddle() {
+  auto paddlePos = this->paddle.getPosition();
+  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) &&
+      paddlePos.y + PADDLE_HEIGHT < SCREEN_HEIGHT) {
+    this->paddle.moveDown();
+  } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && paddlePos.y > 0) {
+    this->paddle.moveUp();
+  }
+}
 bool Game::isOpen() const { return this->window->isOpen(); }
 
 void Game::run() {
@@ -90,11 +92,11 @@ bool Game::ballWallCollision() {
   int y = ballPos.y;
 
   switch (dirInt) {
-  case 0:
+  case 0: // up
   case 1:
     y -= RADIUS;
     break;
-  case 2:
+  case 2: // down
   case 3:
     y += RADIUS;
     break;
@@ -106,4 +108,32 @@ bool Game::ballWallCollision() {
     std::cout << this->ball.getVelocity().second << "\n";
   }
   return wallHit;
+}
+
+bool Game::ballPaddleCollision() {
+  auto ballPos = this->ball.getPosition();
+  auto ballDir = this->ball.getDirection();
+  int dirInt = static_cast<int>(ballDir); // 0-3
+  int x = ballPos.x;
+  switch (dirInt) {
+  case 0: // left
+  case 2:
+    x -= RADIUS;
+    break;
+  case 1: // right
+  case 3:
+    x += RADIUS;
+    break;
+  }
+  //currently only to left paddle
+  auto paddlePos = this->paddle.getPosition();
+  paddlePos.x += PADDLE_WIDTH;
+  if(x <= paddlePos.x){
+    BallDirection ballDirection = this->ball.getDirection();
+    int ballDirectionValue = static_cast<int>(ballDirection);
+    ballDirectionValue += (ballDirectionValue%2 == 0) ? 1 : -1;
+    BallDirection newDir = static_cast<BallDirection>(ballDirectionValue);
+    this->ball.setVelocity(newDir);
+
+  }
 }

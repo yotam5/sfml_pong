@@ -7,8 +7,8 @@
 
 #define RADIUS 10
 #define COLOR White
-#define BALL_X_SPEED 0
-#define BALL_Y_SPEED 5
+#define BALL_X_SPEED 5
+#define BALL_Y_SPEED 6
 
 #ifndef BALLDIR
 #define BALLDIR
@@ -27,6 +27,7 @@ public:
 	void changeXspeed();
 	void updatePosition();
 	void updateDirection();
+	void setVelocity(BallDirection);
 	std::pair<int,int> getVelocity() const;
 private:
 	sf::CircleShape ball;

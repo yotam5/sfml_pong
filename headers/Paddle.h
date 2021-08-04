@@ -15,6 +15,8 @@ public:
 	void render(sf::RenderTarget &target);
 	void moveUp();
 	void moveDown();
+	void setPosition(int,int);
+	sf::Vector2f getPosition() const;
 private:
 	sf::RectangleShape paddle;
 	void init();

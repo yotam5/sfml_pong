@@ -23,8 +23,9 @@ private:
 	void render();
 	void pollEvents();
 	bool ballWallCollision();
-	bool ballPaddleCollision() const;
+	bool ballPaddleCollision();
 	bool outsideWindow() const;
+	void updatePlayerPaddle();
 	bool ballOutsideWindow;
     sf::RenderWindow *window;
     sf::Event event;
@@ -34,4 +35,5 @@ private:
     sf::Sprite background;
     Ball ball;
     Paddle paddle;
+    Paddle bot_paddle;
 };

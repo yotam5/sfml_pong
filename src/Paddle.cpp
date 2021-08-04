@@ -26,11 +26,21 @@ void Paddle::moveDown()
 void Paddle::init()
 {
 	this->paddle = sf::RectangleShape(sf::Vector2f(PADDLE_WIDTH, PADDLE_HEIGHT));
-	this->paddle.setPosition(5,0);
+	this->paddle.setPosition(5,40);
 	this->yVelocity = PADDLE_Y_SPEED;
+}
+
+void Paddle::setPosition(int x, int y)
+{
+	this->paddle.setPosition(x,y);
 }
 
 void Paddle::render(sf::RenderTarget &target)
 {
 	target.draw(this->paddle);
+}
+
+sf::Vector2f Paddle::getPosition() const
+{
+	return this->paddle.getPosition();
 }
