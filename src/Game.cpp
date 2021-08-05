@@ -26,7 +26,7 @@ void Game::initVariables() {
   this->paddle = Paddle(SCREEN_HEIGHT);
   this->bot_paddle = Paddle(SCREEN_HEIGHT);
   this->paddle.setPosition(10, SCREEN_HEIGHT / 2.0);
-  this->bot_paddle.setPosition(SCREEN_WIDTH - 10, SCREEN_HEIGHT / 2.0);
+  this->bot_paddle.setPosition(SCREEN_WIDTH - 20, SCREEN_HEIGHT / 2.0);
   this->winner = false;
 }
 
