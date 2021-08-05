@@ -23,13 +23,15 @@ public:
 	sf::Vector2f getPosition() const;
 	void updatePaddleLocation();
 	void automatedMovment(sf::Vector2f ballpos);
+	PaddleDirections getCurrentDirection() const;
+	void incrementVelocity();
 private:
 	PaddleDirections currentDir;
 	void moveUp();
 	void moveDown(); 
 	sf::RectangleShape paddle;
 	void init();
-	int yVelocity;
-	int max_height;
+	double yVelocity;
+	double max_height;
 };
 

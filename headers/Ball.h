@@ -9,7 +9,7 @@
 #define COLOR White
 #define BALL_X_SPEED 5
 #define BALL_Y_SPEED 6
-#define BALL_SPEED_INCREMENT
+#define Acceleration 0.1
 #ifndef BALLDIR
 #define BALLDIR
  enum class BallDirection{UP_LEFT,UP_RIGHT,DOWN_LEFT,DOWN_RIGHT};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../headers/Game.h"
+#include <SFML/System/Sleep.hpp>
 #include <SFML/Window/Keyboard.hpp>
 
 Game::Game() { this->init(); }
@@ -20,13 +21,13 @@ void Game::init() {
   this->initVariables();
 }
 
-void Game::initVariables()
-{
-  this->ballOutsideWindow = false;
+void Game::initVariables() {
+  this->winner = false;
   this->paddle = Paddle(SCREEN_HEIGHT);
   this->bot_paddle = Paddle(SCREEN_HEIGHT);
   this->paddle.setPosition(10, SCREEN_HEIGHT / 2.0);
-  this->bot_paddle.setPosition(SCREEN_WIDTH-10, SCREEN_HEIGHT / 2.0);
+  this->bot_paddle.setPosition(SCREEN_WIDTH - 10, SCREEN_HEIGHT / 2.0);
+  this->winner = false;
 }
 
 void Game::update() {
@@ -36,18 +37,18 @@ void Game::update() {
   this->bot_paddle.automatedMovment(this->ball.getPosition());
   this->ballPaddleCollision();
   this->ballWallCollision();
+  this->winner = this->ballOutsideWindow();
 }
 
-void Game::updatePlayerPaddle() {
-  this->paddle.updatePaddleLocation();
-}
+void Game::updatePlayerPaddle() { this->paddle.updatePaddleLocation(); }
 bool Game::isOpen() const { return this->window->isOpen(); }
 
 void Game::run() {
-  while (this->isOpen()) {
+  while (this->isOpen() && !this->winner) {
     this->update();
     this->render();
   }
+  sf::sleep(sf::seconds(3));
 }
 
 void Game::initWindow() {
@@ -78,7 +79,7 @@ void Game::pollEvents() {
   }
 }
 
-bool Game::outsideWindow() const {
+bool Game::ballOutsideWindow() const {
   bool outsideWall = false;
   auto ballPos = this->ball.getPosition();
   if (ballPos.x < 0 || ballPos.x > SCREEN_WIDTH) {
@@ -129,52 +130,55 @@ bool Game::ballPaddleCollision() {
     x += RADIUS;
     break;
   }
-  //currently only to left paddle
+  // currently only to left paddle
   auto paddlePos = this->paddle.getPosition();
   auto botPaddlePos = this->bot_paddle.getPosition();
   paddlePos.x += PADDLE_WIDTH;
 
-  bool hitLeft = paddlePos.x >= x && paddlePos.y <= ballPos.y && 
-    paddlePos.y + PADDLE_HEIGHT >= ballPos.y;
+  bool hitLeft = paddlePos.x >= x && paddlePos.y <= ballPos.y &&
+                 paddlePos.y + PADDLE_HEIGHT >= ballPos.y;
 
-  bool hitRight = x >= botPaddlePos.x && botPaddlePos.y <= ballPos.y && 
-    botPaddlePos.y + PADDLE_HEIGHT >= ballPos.y;  
+  bool hitRight = x >= botPaddlePos.x && botPaddlePos.y <= ballPos.y &&
+                  botPaddlePos.y + PADDLE_HEIGHT >= ballPos.y;
 
-  if(hitLeft || hitRight){
+  if (hitLeft || hitRight) {
+    auto &paddleHit = (hitLeft) ? this->paddle : this->bot_paddle;
+
     BallDirection ballDirection = this->ball.getDirection();
     int ballDirectionValue = static_cast<int>(ballDirection);
+    int paddleDirectionValue =
+        static_cast<int>(paddleHit.getCurrentDirection());
     DEBUG(this->ball.getVelocity().second);
-    switch(ballDirectionValue){
+    this->paddle.incrementVelocity();
+    this->bot_paddle.incrementVelocity();
+    switch (ballDirectionValue) {
+    case 0: // up
+    case 1:
+      DEBUG("BALL UP");
+      switch (paddleDirectionValue) {
       case 0:
+        this->ball.incrementVelocity();
+        break;
       case 1:
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)){
-          this->ball.incrementVelocity();
-          DEBUG("increment velocity")
-        }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)){
-          this->ball.decrementVelocity();
-          DEBUG("decrement");
-        }
+        this->ball.decrementVelocity();
         break;
-      case 2:
-      case 3:
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)){
-          this->ball.incrementVelocity();
-          DEBUG("incrementVelocity");
-        }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)){
-          this->ball.decrementVelocity();
-          DEBUG("decrement");
-        }
+      }
+      break;
+    case 2: // down
+    case 3:
+      DEBUG("BALL DOWN");
+      switch (paddleDirectionValue) {
+      case 0:
+        this->ball.decrementVelocity();
         break;
-      default:
-        DEBUG("switch error");
-
+      case 1:
+        this->ball.incrementVelocity();
+        break;
+      }
+      break;
     }
-    //800 pqico
-
     DEBUG(this->ball.getVelocity().second);
-    ballDirectionValue += (ballDirectionValue%2 == 0) ? 1 : -1;
+    ballDirectionValue += (ballDirectionValue % 2 == 0) ? 1 : -1;
     BallDirection newDir = static_cast<BallDirection>(ballDirectionValue);
     this->ball.setVelocity(newDir);
   }

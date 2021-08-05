@@ -61,13 +61,13 @@ std::pair<double, double> Ball::getVelocity() const {
 
 void Ball::incrementVelocity()
 {
-  this->yVelocity *= 1.25; 
+  this->yVelocity *= (1+Acceleration); 
 }
 
 void Ball::decrementVelocity()
 {
   double yVelocityDec = this->yVelocity;
-  yVelocityDec *= 0.90;
+  yVelocityDec *= (1 - Acceleration);
   if(yVelocityDec > BALL_Y_SPEED)
   {
     this->yVelocity = yVelocityDec;

@@ -22,6 +22,10 @@ void Paddle::moveDown() {
   this->currentDir = PaddleDirections::DOWN;
 }
 
+void Paddle::incrementVelocity()
+{
+	this->yVelocity += 0.5;
+}
 void Paddle::init() {
   this->paddle = sf::RectangleShape(sf::Vector2f(PADDLE_WIDTH, PADDLE_HEIGHT));
   this->yVelocity = PADDLE_Y_SPEED;
@@ -42,6 +46,12 @@ void Paddle::automatedMovment(sf::Vector2f ballpos) {
   	this->currentDir = PaddleDirections::NOT_MOVING;
   }
 }
+
+PaddleDirections Paddle::getCurrentDirection() const
+{
+	return this->currentDir;
+}
+
 
 void Paddle::setPosition(int x, int y) { this->paddle.setPosition(x, y); }
 

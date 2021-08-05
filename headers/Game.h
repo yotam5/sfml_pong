@@ -27,9 +27,9 @@ private:
 	void pollEvents();
 	bool ballWallCollision();
 	bool ballPaddleCollision();
-	bool outsideWindow() const;
+	bool ballOutsideWindow() const;
 	void updatePlayerPaddle();
-	bool ballOutsideWindow;
+	bool winner;
     sf::RenderWindow *window;
     sf::Event event;
     sf::Font font;
