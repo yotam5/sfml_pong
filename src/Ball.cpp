@@ -36,10 +36,10 @@ void Ball::init() {
   this->ball = sf::CircleShape(RADIUS);
   this->ball.setOutlineColor(sf::Color::COLOR);
   this->ball.setOrigin(RADIUS, RADIUS);
-  this->ball.setPosition(300,10);
+  this->ball.setPosition(400,10);
+  this->xVelocity = BALL_X_SPEED;
+  this->yVelocity = BALL_Y_SPEED;
   this->setVelocity(BallDirection::DOWN_LEFT);
-  /*this->xVelocity = BALL_X_SPEED;
-  this->yVelocity = BALL_Y_SPEED;*/
 }
 
 void Ball::render(sf::RenderTarget &target) { target.draw(ball); }
@@ -49,11 +49,27 @@ BallDirection Ball::getDirection() const { return this->currentDirection; }
 void Ball::setVelocity(BallDirection balldir) {
   this->currentDirection = balldir;
   int dir = static_cast<int>(balldir);
-
-  this->xVelocity = (dir % 2 == 0) ? (-1) * BALL_X_SPEED : BALL_X_SPEED;
-  this->yVelocity = (dir > 1) ? BALL_Y_SPEED : (-1) * BALL_X_SPEED;
+  double ballxspeed = fabs(this->xVelocity);
+  double ballyspeed = fabs(this->yVelocity);
+  this->xVelocity = (dir % 2 == 0) ? (-1) * ballxspeed : ballxspeed;
+  this->yVelocity = (dir > 1) ? ballyspeed : (-1) * ballyspeed;
 }
 
-std::pair<int, int> Ball::getVelocity() const {
+std::pair<double, double> Ball::getVelocity() const {
   return std::make_pair(this->xVelocity, this->yVelocity);
+}
+
+void Ball::incrementVelocity()
+{
+  this->yVelocity *= 1.25; 
+}
+
+void Ball::decrementVelocity()
+{
+  double yVelocityDec = this->yVelocity;
+  yVelocityDec *= 0.90;
+  if(yVelocityDec > BALL_Y_SPEED)
+  {
+    this->yVelocity = yVelocityDec;
+  }
 }

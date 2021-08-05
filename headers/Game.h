@@ -9,6 +9,8 @@
 
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
+#define DEBUGGING_MODE true
+#define DEBUG(x) if(DEBUGGING_MODE){ std::cout << x << std::endl;}
 
 class Game{
 public:
@@ -19,6 +21,7 @@ public:
 	void run();
 private:
 	void init();
+	void initVariables();
 	void initWindow();
 	void render();
 	void pollEvents();

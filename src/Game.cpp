@@ -9,6 +9,7 @@ void Game::render() {
   this->window->clear();
   this->ball.render(*this->window);
   this->paddle.render(*this->window);
+  this->bot_paddle.render(*this->window);
   this->window->display();
 }
 
@@ -16,26 +17,29 @@ Game::~Game() { delete this->window; }
 
 void Game::init() {
   this->initWindow();
+  this->initVariables();
+}
+
+void Game::initVariables()
+{
   this->ballOutsideWindow = false;
+  this->paddle = Paddle(SCREEN_HEIGHT);
+  this->bot_paddle = Paddle(SCREEN_HEIGHT);
+  this->paddle.setPosition(10, SCREEN_HEIGHT / 2.0);
+  this->bot_paddle.setPosition(SCREEN_WIDTH-10, SCREEN_HEIGHT / 2.0);
 }
 
 void Game::update() {
   this->pollEvents();
-
   this->updatePlayerPaddle();
-  this->ballPaddleCollision();
   this->ball.updatePosition();
+  this->bot_paddle.automatedMovment(this->ball.getPosition());
+  this->ballPaddleCollision();
   this->ballWallCollision();
 }
 
 void Game::updatePlayerPaddle() {
-  auto paddlePos = this->paddle.getPosition();
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) &&
-      paddlePos.y + PADDLE_HEIGHT < SCREEN_HEIGHT) {
-    this->paddle.moveDown();
-  } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && paddlePos.y > 0) {
-    this->paddle.moveUp();
-  }
+  this->paddle.updatePaddleLocation();
 }
 bool Game::isOpen() const { return this->window->isOpen(); }
 
@@ -103,7 +107,7 @@ bool Game::ballWallCollision() {
   }
   bool wallHit = (y >= SCREEN_HEIGHT || y <= 0);
   if (wallHit) {
-    std::cout << "HIT WALL!" << std::endl;
+    DEBUG("HIT WALL!");
     this->ball.changeYspeed();
     std::cout << this->ball.getVelocity().second << "\n";
   }
@@ -127,13 +131,51 @@ bool Game::ballPaddleCollision() {
   }
   //currently only to left paddle
   auto paddlePos = this->paddle.getPosition();
+  auto botPaddlePos = this->bot_paddle.getPosition();
   paddlePos.x += PADDLE_WIDTH;
-  if(x <= paddlePos.x){
+
+  bool hitLeft = paddlePos.x >= x && paddlePos.y <= ballPos.y && 
+    paddlePos.y + PADDLE_HEIGHT >= ballPos.y;
+
+  bool hitRight = x >= botPaddlePos.x && botPaddlePos.y <= ballPos.y && 
+    botPaddlePos.y + PADDLE_HEIGHT >= ballPos.y;  
+
+  if(hitLeft || hitRight){
     BallDirection ballDirection = this->ball.getDirection();
     int ballDirectionValue = static_cast<int>(ballDirection);
+    DEBUG(this->ball.getVelocity().second);
+    switch(ballDirectionValue){
+      case 0:
+      case 1:
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)){
+          this->ball.incrementVelocity();
+          DEBUG("increment velocity")
+        }
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)){
+          this->ball.decrementVelocity();
+          DEBUG("decrement");
+        }
+        break;
+      case 2:
+      case 3:
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)){
+          this->ball.incrementVelocity();
+          DEBUG("incrementVelocity");
+        }
+        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)){
+          this->ball.decrementVelocity();
+          DEBUG("decrement");
+        }
+        break;
+      default:
+        DEBUG("switch error");
+
+    }
+    //800 pqico
+
+    DEBUG(this->ball.getVelocity().second);
     ballDirectionValue += (ballDirectionValue%2 == 0) ? 1 : -1;
     BallDirection newDir = static_cast<BallDirection>(ballDirectionValue);
     this->ball.setVelocity(newDir);
-
   }
 }

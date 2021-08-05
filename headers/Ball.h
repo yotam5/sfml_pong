@@ -9,7 +9,7 @@
 #define COLOR White
 #define BALL_X_SPEED 5
 #define BALL_Y_SPEED 6
-
+#define BALL_SPEED_INCREMENT
 #ifndef BALLDIR
 #define BALLDIR
  enum class BallDirection{UP_LEFT,UP_RIGHT,DOWN_LEFT,DOWN_RIGHT};
@@ -28,11 +28,13 @@ public:
 	void updatePosition();
 	void updateDirection();
 	void setVelocity(BallDirection);
-	std::pair<int,int> getVelocity() const;
+	void incrementVelocity();
+	void decrementVelocity();
+	std::pair<double,double> getVelocity() const;
 private:
 	sf::CircleShape ball;
 	BallDirection currentDirection;
-	int xVelocity;
-	int yVelocity;
+	double xVelocity;
+	double yVelocity;
 	void init();
 };
